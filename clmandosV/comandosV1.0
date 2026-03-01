@@ -1,0 +1,49 @@
+{
+  "comandos": [
+    {
+      "comando": "help",
+      "accion": "echo '🌱 Comandos disponibles:'; jq -r '.comandos[] | \"  - \\(.comando): \\(.descripcion)\"' \"$ROOT_DIR/json/comandos.json\"",
+      "descripcion": "Muestra esta lista de comandos"
+    },
+    {
+      "comando": "ver",
+      "accion": "ls -F --color=auto \"$APPS_DIR\"",
+      "descripcion": "Muestra las apps plantadas en /apps"
+    },
+    {
+      "comando": "instalar",
+      "accion": "URL=$(jq -r '.url' \"$ROOT_DIR/json/link.json\"); echo \"📡 Trayendo semillas de: $URL\"; git clone \"$URL\" \"$APPS_DIR/temp_repo\" -q && cp -r \"$APPS_DIR/temp_repo/\"* \"$APPS_DIR/\" 2>/dev/null; rm -rf \"$APPS_DIR/temp_repo\"; echo \"✅ Cosecha completa. Todas las apps instaladas.\"",
+      "descripcion": "Descarga e instala TODAS las apps del repositorio"
+    },
+    {
+      "comando": "apps.disponibles",
+      "accion": "URL=$(jq -r '.url' \"$ROOT_DIR/json/link.json\"); CACHE=\"$ROOT_DIR/.repo_cache\"; echo '🔄 Conectando con el repo de Github...'; rm -rf \"$CACHE\"; git clone \"$URL\" \"$CACHE\" -q; echo '🛒 Catálogo de Apps:'; for app in \"$CACHE\"/*; do [ -e \"$app\" ] || continue; name=$(basename \"$app\"); if [ -d \"$app\" ] || [[ \"$name\" == \"README.md\" ]]; then continue; fi; if [ -f \"$APPS_DIR/$name\" ]; then echo \"  ✅ $name\"; else echo \"  ❌ $name\"; fi; done",
+      "descripcion": "Muestra qué apps del repo están instaladas y cuáles no"
+    },
+    {
+      "comando": "instalar.app",
+      "accion": "if [ -z \"$1\" ]; then echo '⚠️ Uso: instalar.app [nombre.sh]'; else CACHE=\"$ROOT_DIR/.repo_cache\"; URL=$(jq -r '.url' \"$ROOT_DIR/json/link.json\"); [ -d \"$CACHE\" ] || git clone \"$URL\" \"$CACHE\" -q; if [ -f \"$CACHE/$1\" ]; then cp \"$CACHE/$1\" \"$APPS_DIR/\"; chmod +x \"$APPS_DIR/$1\"; echo \"✅ '$1' ha sido plantada en tu huerto.\"; else echo \"❌ No existe '$1' en el semillero.\"; fi; fi",
+      "descripcion": "Instala una sola app específica (ej: instalar.app reloj.sh)"
+    },
+    {
+      "comando": "ejecutar",
+      "accion": "if [ -z \"$1\" ]; then echo '⚠️ Faltó el nombre. Uso: ejecutar [app.sh]'; elif [ -f \"$APPS_DIR/$1\" ]; then echo '🚀 Iniciando app...'; bash \"$APPS_DIR/$1\"; else echo \"❌ La app '$1' no existe en /apps\"; fi",
+      "descripcion": "Ejecuta una app (ejemplo: ejecutar reloj.sh)"
+    },
+    {
+      "comando": "limpiar",
+      "accion": "rm -rf \"$APPS_DIR/\"* ; echo '🧹 Huerto limpiado. No quedan apps.'",
+      "descripcion": "Elimina todas las apps de la carpeta /apps"
+    },
+    {
+      "comando": "link",
+      "accion": "cat \"$ROOT_DIR/json/link.json\"",
+      "descripcion": "Muestra la configuración del repositorio actual"
+    },
+    {
+      "comando": "borrar",
+      "accion": "clear; echo '=========================================='; echo '  🥦 VerduraOS v1.1 - Nivel PRO 🥕'; echo '=========================================='; echo ''",
+      "descripcion": "Limpia la pantalla y muestra el logo"
+    }
+  ]
+}
