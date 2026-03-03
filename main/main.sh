@@ -17,8 +17,7 @@ export REPO_CACHE="$ROOT_DIR/.repo_cache"
 export START_TIME=$(date +%s)
 
 # --- CAPA 1: SISTEMA DE COLORES E INTERFAZ ---
-C_V="\e[1;32m"; C_A="\e[1;33m"; C_C="\e[1;36m"; C_R="\e[1;31m"
-C_M="\e[1;35m"; C_B="\e[1;37m"; C_G="\e[0;90m"; C_0="\e[0m"
+C_V="\e[1;32m"; C_A="\e[1;33m"; C_C="\e[1;36m"; C_R="\e[1;31m"; C_0="\e[0m"
 
 # --- CAPA 2: MOTOR DE AUDITORÍA Y REGISTRO (LOGGING) ---
 log_kernel() {
@@ -30,17 +29,17 @@ log_kernel() {
 
 # --- CAPA 3: MANUAL TÉCNICO DE ARQUITECTURA ---
 show_tech_specs() {
-    echo -e "${C_B}================================================================${C_0}"
+    echo -e "${C_C}================================================================${C_0}"
     echo -e "${C_V}         GIGA-MONOLITH | ESPECIFICACIONES DE NÚCLEO${C_0}"
-    echo -e "${C_B}================================================================${C_0}"
+    echo -e "${C_C}================================================================${C_0}"
     echo -e "${C_C}1. CONTROL DE VERSIONES DINÁMICO:${C_0}"
-    echo "   El Kernel hereda su versión ($SYS_VERSION) directamente"
-    echo "   del archivo JSON activo, permitiendo distribuciones custom."
-    echo ""
+    echo -e "${C_C}   El Kernel hereda su versión ($SYS_VERSION) directamente"
+    echo -e "${C_C}   del archivo JSON activo, permitiendo distribuciones custom.${C_0}"
+    echo -e "${C_C}${C_0}" # línea espaciadora en azul
     echo -e "${C_C}2. COMANDOS INMORTALES:${C_0}"
-    echo "   'usar' e 'instalar.tabla' están embebidos en el Kernel."
-    echo "   Nunca perderás el control, incluso si el JSON se corrompe."
-    echo -e "${C_B}================================================================${C_0}"
+    echo -e "${C_C}   'usar' e 'instalar.tabla' están embebidos en el Kernel."
+    echo -e "${C_C}   Nunca perderás el control, incluso si el JSON se corrompe.${C_0}"
+    echo -e "${C_C}================================================================${C_0}"
 }
 
 # --- CAPA 4: FIREWALL PROACTIVO ---
@@ -104,26 +103,31 @@ sys_internals() {
         "sys.stats")
             local up=$(($(date +%s) - START_TIME))
             echo -e "${C_V}--- ESTADO DEL NÚCLEO ---${C_0}"
-            echo "Distribución: $SYS_VERSION"
-            echo "Arranque: $up segundos activo"
-            echo "Tabla Activa: $(basename "$CONFIG_JSON")"
+            echo -e "${C_C}Distribución: $SYS_VERSION${C_0}"
+            echo -e "${C_C}Arranque: $up segundos activo${C_0}"
+            echo -e "${C_C}Tabla Activa: $(basename "$CONFIG_JSON")$C_0"
             return 0 ;;
         "sys.tech") show_tech_specs; return 0 ;;
-        "sys.logs") tail -n 25 "$LOG_FILE"; return 0 ;;
+        "sys.logs") 
+            echo -ne "${C_C}" # Set logs color to cyan/blue
+            tail -n 25 "$LOG_FILE"
+            echo -ne "${C_0}" # Reset color
+            return 0 ;;
         # LIBRERÍA INMORTAL (No importa si el JSON está vacío, estos siempre funcionan)
         "usar")
-            if [ -z "$arg_in" ]; then echo '⚠️ Uso: usar nombre.json'; return 0; fi
+            if [ -z "$arg_in" ]; then echo -e "${C_C}⚠️ Uso: usar nombre.json${C_0}"; return 0; fi
             if [ -f "$ROOT_DIR/json/$arg_in" ]; then 
                 echo "$arg_in" > "$ROOT_DIR/config/active.conf"
-                echo "✅ Tabla '$arg_in' activada. Reinicia VerduraOS."
+                echo -e "${C_C}✅ Tabla '$arg_in' activada. Reinicia VerduraOS.${C_0}"
             else 
-                echo "❌ No existe $ROOT_DIR/json/$arg_in"
+                echo -e "${C_R}❌ No existe $ROOT_DIR/json/$arg_in${C_0}"
             fi
             return 0 ;;
         "instalar.tabla")
-            if [ -z "$arg_in" ]; then echo '⚠️ Uso: instalar.tabla [nombre.json]'; return 0; fi
-            wget -q "https://raw.githubusercontent.com/loslocos817yt-star/apps/main/clmandosV/$arg_in" -O "$ROOT_DIR/json/$arg_in" && echo "✅ Tabla '$arg_in' descargada." || echo '❌ Error al conectar.'
+            if [ -z "$arg_in" ]; then echo -e "${C_C}⚠️ Uso: instalar.tabla [nombre.json]${C_0}"; return 0; fi
+            wget -q "https://raw.githubusercontent.com/loslocos817yt-star/apps/main/clmandosV/$arg_in" -O "$ROOT_DIR/json/$arg_in" && echo -e "${C_C}✅ Tabla '$arg_in' descargada.${C_0}" || echo -e "${C_R}❌ Error al conectar.${C_0}"
             return 0 ;;
+        "borrar") clear; return 0 ;;
     esac
     return 1
 }
@@ -134,7 +138,7 @@ touch "$LOG_FILE"
 kernel_authenticate
 
 # Determinar tabla activa
-[ -f "$CONF_FILE" ] && T_LOAD=$(cat "$CONF_FILE") || T_LOAD="comandos.json"
+[ -f "$CONF_FILE" ] && T_LOAD=$(cat "$CONF_FILE") || T_LOAD="comandosV1.0.json"
 export CONFIG_JSON="$ROOT_DIR/json/$T_LOAD"
 
 # Si no existe, creamos un JSON base con versión por defecto
@@ -146,20 +150,32 @@ fi
 export SYS_VERSION=$(jq -r '.Version // "Unknown-Core"' "$CONFIG_JSON" 2>/dev/null)
 
 clear
-echo -e "${C_V}🥦 VerduraOS | $SYS_VERSION${C_0}"
-echo -e "${C_G}Librería principal inmortal activa. Blindaje OK.${C_0}"
-echo "----------------------------------------------------------------"
+# NUEVO LOGOTIPO ASCII EN VERDE CON LÍNEAS VERDES
+echo -e "${C_V}================================================================${C_0}"
+echo -e "${C_V}__     __            _                    ____   _____ ${C_0}"
+echo -e "${C_V}\\\\ \\\\   / /__ _ __  __| |_   _ _ __ __ _   / __ \\\\ / ____|${C_0}"
+echo -e "${C_V} \\\\ \\\\ / / _ \\\\ '__|/ _\` | | | | '__/ _\` | | |  | | (___  ${C_0}"
+echo -e "${C_V}  \\\\ V /  __/ |  | (_| | |_| | | | (_| | | |__| |\\\\___ \\\\ ${C_0}"
+echo -e "${C_V}   \\\\_/ \\\\___|_|   \\\\__,_|\\\\__,_|_|  \\\\__,_|  \\\\____/ _____/ ${C_0}"
+echo -e "${C_V}================================================================${C_0}"
+echo -e "${C_V}================================================================${C_0}"
+echo -e "${C_V}🥦 VerduraOS | ${C_C}$SYS_VERSION${C_0}"
+echo -e "${C_C}Librería principal inmortal activa. Blindaje OK.${C_0}"
+echo -e "${C_C}----------------------------------------------------------------${C_0}"
 
 # --- BUCLE DE CONTROL DE EVENTOS ---
 while true; do
     T_LOG=$(date +%H:%M:%S)
-    read -p "$(echo -e "${C_V}[$T_LOG] ${C_C}${CURRENT_USER}${C_V}@VerduraOS: ${C_0}")" input
+    
+    # CONFIGURAR PROMPT (USUARIO Y @VERDURAOS EN ROJO) Y ESCRITURA EN AMARILLO
+    echo -ne "${C_A}"; read -p "$(echo -e "${C_C}[$T_LOG] ${C_R}${CURRENT_USER}@VerduraOS: ") " input; echo -ne "${C_0}"
     
     [ -z "$input" ] && continue
     read -r -a p <<< "$input"
     cmd="${p[0]}"; args="${p[@]:1}"
 
-    [[ "$cmd" == "salir" || "$cmd" == "exit" ]] && break
+    # EMOJI 🔥 AL SALIR
+    [[ "$cmd" == "salir" || "$cmd" == "exit" ]] && { echo -e "🔥"; break; }
 
     # 1. Comandos Nativos / Inmortales (Pasa el primer argumento también)
     if sys_internals "$cmd" "${p[1]}"; then continue; fi
@@ -169,7 +185,10 @@ while true; do
 
     if [[ -n "$accion" && "$accion" != "null" ]]; then
         if is_action_secure "$accion"; then
+            # CONFIGURAR RESPUESTA GENERAL EN AZUL
+            echo -ne "${C_C}"
             bash -c "$accion" _ $args
+            echo -ne "${C_0}"
         fi
     else
         echo -e "${C_R}❌ Error: '$cmd' no existe en $SYS_VERSION.${C_0}"
