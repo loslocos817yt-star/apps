@@ -1,5 +1,5 @@
 {
-  "Version": "1.0 Beta",
+  "Version": "1.0 Beta - Blindado",
   "comandos": [
     {
       "comando": "help",
@@ -8,12 +8,12 @@
     },
     {
       "comando": "usar",
-      "accion": "if [ -z \"$1\" ]; then echo '⚠️ Uso: usar nombre.json'; exit 1; fi; if [ -f \"$ROOT_DIR/json/$1\" ]; then echo \"$1\" > \"$ROOT_DIR/config/active.conf\"; echo \"✅ Tabla '$1' activada → sal y vuelve a entrar\"; else echo \"❌ No existe $ROOT_DIR/json/$1\"; fi",
+      "accion": "if [ -z \"$1\" ]; then echo '⚠️ Uso: usar archivo.json'; exit 1; fi; if [ -f \"$ROOT_DIR/json/$1\" ]; then echo \"$1\" > \"$ROOT_DIR/config/active.conf\"; echo \"✅ Tabla '$1' activada → reinicia el sistema\"; else echo \"❌ No existe $ROOT_DIR/json/$1\"; fi",
       "descripcion": "Cambia la tabla de comandos activa"
     },
     {
       "comando": "instalar.tabla",
-      "accion": "if [ -z \"$1\" ]; then echo '⚠️ Uso: instalar.tabla [nombre.json]'; else wget -q \"https://raw.githubusercontent.com/loslocos817yt-star/apps/main/clmandosV/$1\" -O \"$ROOT_DIR/json/$1\" && echo \"✅ Tabla '$1' descargada.\" || echo '❌ Error al conectar.'; fi",
+      "accion": "if [ -z \"$1\" ]; then echo '⚠️ Uso: instalar.tabla [archivo.json]'; exit 1; fi; wget -q \"https://raw.githubusercontent.com/loslocos817yt-star/apps/main/clmandosV/$1\" -O \"$ROOT_DIR/json/$1\" && echo \"✅ Tabla '$1' descargada.\" || echo '❌ Error al conectar.';",
       "descripcion": "Descarga nuevas Tablas de Comandos"
     },
     {
@@ -28,17 +28,17 @@
     },
     {
       "comando": "apps.disponibles",
-      "accion": "URL=$(jq -r '.url // \"https://github.com/tu-repo\"' \"$ROOT_DIR/json/link.json\"); CACHE=\"$ROOT_DIR/.repo_cache\"; rm -rf \"$CACHE\"; git clone \"$URL\" \"$CACHE\" -q 2>/dev/null; echo '🛒 Catálogo:'; for app in \"$CACHE\"/*; do [ -e \"$app\" ] || continue; name=$(basename \"$app\"); [[ -d \"$app\" || \"$name\" == \"README.md\" ]] && continue; [ -f \"$APPS_DIR/$name\" ] && echo \"  ✅ $name\" || echo \"  ❌ $name\"; done",
+      "accion": "URL=$(jq -r '.url // \"https://github.com/tu-repo\"' \"$ROOT_DIR/json/link.json\"); CACHE=\"$ROOT_DIR/.repo_cache\"; rm -rf \"$CACHE\"; git clone \"$URL\" \"$CACHE\" -q 2>/dev/null; echo '🛒 Catálogo:'; for app in \"$CACHE\"/*; do [ -e \"$app\" ] || continue; name=$(basename \"$app\"); [[ -d \"$app\" || \"$name\" == \"README.md\" ]] && continue; if [ -f \"$APPS_DIR/$name\" ]; then echo \"  ✅ $name\"; else echo \"  ❌ $name\"; fi; done",
       "descripcion": "Muestra qué apps del repo están instaladas"
     },
     {
       "comando": "instalar.app",
-      "accion": "if [ -z \"$1\" ]; then echo '⚠️ Uso: instalar.app [app.sh]'; else CACHE=\"$ROOT_DIR/.repo_cache\"; URL=$(jq -r '.url // \"https://github.com/tu-repo\"' \"$ROOT_DIR/json/link.json\"); [ -d \"$CACHE\" ] || git clone \"$URL\" \"$CACHE\" -q 2>/dev/null; if [ -f \"$CACHE/$1\" ]; then cp \"$CACHE/$1\" \"$APPS_DIR/\"; chmod +x \"$APPS_DIR/$1\"; echo \"✅ '$1' instalada.\"; else echo \"❌ No existe '$1' en el repo.\"; fi; fi",
+      "accion": "if [ -z \"$1\" ]; then echo '⚠️ Uso: instalar.app [app.sh]'; exit 1; fi; CACHE=\"$ROOT_DIR/.repo_cache\"; URL=$(jq -r '.url // \"https://github.com/tu-repo\"' \"$ROOT_DIR/json/link.json\"); [ -d \"$CACHE\" ] || git clone \"$URL\" \"$CACHE\" -q 2>/dev/null; if [ -f \"$CACHE/$1\" ]; then cp \"$CACHE/$1\" \"$APPS_DIR/\"; chmod +x \"$APPS_DIR/$1\"; echo \"✅ '$1' instalada.\"; else echo \"❌ No existe '$1' en el repo.\"; fi",
       "descripcion": "Instala una app específica"
     },
     {
       "comando": "ejecutar",
-      "accion": "if [ -z \"$1\" ]; then echo '⚠️ Uso: ejecutar [app.sh]'; elif [ -f \"$APPS_DIR/$1\" ]; then echo '🚀 Iniciando $1...'; bash \"$APPS_DIR/$1\"; else echo \"❌ No existe '$1' en /apps\"; fi",
+      "accion": "if [ -z \"$1\" ]; then echo '⚠️ Uso: ejecutar [app.sh]'; exit 1; fi; if [ -f \"$APPS_DIR/$1\" ]; then echo '🚀 Iniciando $1...'; bash \"$APPS_DIR/$1\"; else echo \"❌ No existe '$1' en /apps\"; fi",
       "descripcion": "Ejecuta una app"
     },
     {
@@ -53,7 +53,7 @@
     },
     {
       "comando": "borrar",
-      "accion": "clear; echo -e \"\\e[32m🥦 VerduraOS | $SYS_VERSION\\e[0m\"; echo \"----------------------------------------\"",
+      "accion": "clear",
       "descripcion": "Limpia la pantalla"
     }
   ]
